@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.slim.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+    <style>
+        body {font-family: Arial, Helvetica, sans-serif;}
+        /* The Modal (background) */
+        .modal {
+          display: none; /* Hidden by default */
+          position: fixed; /* Stay in place */
+          z-index: 1; /* Sit on top */
+          padding-top: 100px; /* Location of the box */
+          left: 0;
+          top: 0;
+          width: 100%; /* Full width */
+          height: 100%; /* Full height */
+          overflow: auto; /* Enable scroll if needed */
+          background-color: rgb(0,0,0); /* Fallback color */
+          background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        } 
+        
+        /* Modal Content */
+        .modal-content {
+          background-color: #fefefe;
+          margin: auto;
+          padding: 20px;
+          border: 1px solid #888;
+          width: 80%;
+        }
+        
+        /* The Close Button */
+        .close {
+          color: #aaaaaa;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+        }
+        
+        .close:hover,
+        .close:focus {
+          color: #000;
+          text-decoration: none;
+          cursor: pointer;
+        }
+        </style>
+        <!--Put Ajax code to send dat to node server using Ajax here -->
+        <script>
+            $(document).ready(function() {         
+                $(".btn").on('click', (function(){
+                    const eventTitle = $(this).attr("value");
+                    const eventUrl = "/edit/" + eventTitle;
+                    // alert(eventUrl);
+                    //call ajax to populate the edit event form
+                    $.ajax({
+                        url:"/edit/" + eventTitle,
+                        type:"GET",
+                        success:function(data)
+                        {
+                            //change the modal form fields
+                            console.log(data);
+                            const seTitle = data[0]["seTitle"];
+                            const seStartDate = data[0]["seStartDate"].slice(0,10);
+                            const seEndDate = data[0]["seEndDate"].slice(0,10);
+                            const seLocation = data[0]["seLocation"];
+                            const seDescription = data[0]["seDescription"];
+                            const seUrl = data[0]["seUrl"];
+                            const seActive = data[0]["seActive"];
+                            $('#titleInput').val(seTitle);
+                            $('#startDateInput').val(seStartDate);
+                            $('#endDateInput').val(seEndDate);
+                            $('#locationInput').val(seLocation);
+                            $('#descriptionInput').val(seDescription);
+                            $('#urlInput').val(seUrl);
+                            $( "#activeInput").prop('checked', seActive);
+                            //show modal
+                            $('#myModal').show();
+                        },
+                        error:function(data)
+                        {
+                            console.log(data);
+                        }
+                    })
+                    }));
+            });  
+
+        </script>
+</head>
+<body>
+    <p id = "testResults"></p>
+    <button type="submit" id="clickButton1" class = "events" value="Test Button">
+        Test Button</button>
+    <!--add the header -->
+    <main class = "container-out">
+        <h1 class = "heading1">Events Administration</h1>
+        <div class = "search-form">
+            <form class = "form" method = "post" action = "/search">
+                <label for = "seTitle" class = "form-label">Event Label Contains</label>
+                <input type="text" name ="seTitle">
+                <br>
+                <label>Start Date Before</label>
+                <input type="date" name = "seStartDate">
+                <br>
+                <label>Start Date After</label>
+                <input type="date" name = "seEndDate">
+                <br>
+                <input type="submit" value="Search Events">
+            </form>
+        </div>
+        <!-- Modal Box for adding event -->
+        <button id="myBtn">Add Event</button>
+        <!-- modal container -->
+            <div id="myModal" class="modal">
+                <div class = "modal-content">
+                    <span class="close">&times;</span>
+                    <form class = "form" method = "post" action = "/add">
+                        <label for="seTitle">Event Title *</label>
+                        <input type="text" name="seTitle" id = "titleInput"required/>
+                        <br>
+                        <label for="seStartDate">Start Date *</label>
+                        <input type="date" name="seStartDate" id = "startDateInput" required />
+                        <br>
+                        <label for="seEndDate">End Date</label>
+                        <input type="date" name="seEndDate" id = "endDateInput"/>
+                        <br>
+                        <label for="location">Event Location</label>
+                        <input type="text" name="seLocation" id = "locationInput"/>
+                        <br>
+                        <label for="description">Event Description</label>
+                        <input type="text" name="seDescription" id = "descriptionInput"/>
+                        <br>
+                        <label for="url">Event URL</label>
+                        <input type="text" name="seUrl" id = "urlInput" />
+                        <br>
+                        <input type="checkbox" name="seActive" value=true id = "activeInput/>
+                        <label for="hideEvent"> Hide Event</label>
+                        <br>
+                        <input type="submit" value="Save Event">
+                        <button type="cancel" onclick="javascript:window.location='http://stackoverflow.com';">Cancel</button>
+                    </form>
+                </div>
+            </div> 
+            
+            <script>
+                //show modal on click
+                var modal = document.getElementById("myModal");
+                var btn = document.getElementById("myBtn");
+                var span = document.getElementsByClassName("close")[0];
+                btn.onclick = function() {
+                  modal.style.display = "block";
+                }
+                span.onclick = function() {
+                  modal.style.display = "none";
+                }
+                window.onclick = function(event) {
+                  if (event.target == modal) {
+                    modal.style.display = "none";
+                  }
+                }
+                </script>
+        <!--Here show table -->
+        <div>
+            <table class="table">
+                <thead>
+                    <th scope="col">
+                        Event Title
+                    </th>
+                    <th scope="col">
+                        Event Start Date
+                    </th>
+                    <th scope="col">
+                        Event Description
+                    </th>
+                </thead>
+                <!--Search Type based on change the events shown-->
+                <tbody>
+                    <tr>
+                    <% if (requestType == "List")
+                        { %>
+                        <!--Add the API response of events list here -->
+                        <!--if there are any events-->
+                        <% if (events.length > 0) { %>
+                            <% events.forEach(eachEvent => {
+                                let eventTitle = eachEvent['seTitle'];
+                                let eventStartDate = eachEvent['seStartDate'];
+                                let eventDescription = eachEvent['seDescription']; %>
+                                <!-- add on click to call the modal form -->
+                                <td><button type="submit" class="btn" class = "events"value="<%= eventTitle %>">
+                                    <%= eventTitle %></button></td>
+                                <td><%= eventStartDate %></td>
+                                <td><%= eventDescription %></td>
+                            </tr>
+                            <% }) %>
+                        <% }
+                        else
+                        { %>
+                            <td colspan="3">There are no events to display...</td>
+                        <%} %>
+
+                    <% } %>
+        
+                    <!--To show results from search feature-->
+                    <% if (requestType == "Search")
+                        { %>
+                        <!--Add the API response of events list here -->
+                        <!--if there are any events-->
+                        <% if (events.length > 0) { %>
+                            <% events.forEach(eachEvent => {
+                                let eventTitle = eachEvent['seTitle'];
+                                let eventStartDate = eachEvent['seStartDate'];
+                                let eventDescription = eachEvent['seDescription']; %>
+                                <!-- add on click to call the modal form -->
+                                <td><button type="submit" class="btn" class = "events"value="<%= eventTitle %>">
+                                    <%= eventTitle %></button></td>
+                                <td><%= eventStartDate %></td>
+                                <td><%= eventDescription %></td>
+                            </tr>
+                            <% }) %>
+                        <% }
+                        else
+                        { %>
+                            <td colspan="3">There are no events to display...</td>
+                        <%} %>
+
+                    <% } %>
+
+                    <!--To show results of Set (New Event) feature-->
+                    <% if (requestType == "Set")
+                    { %>
+                    <!--Add the API response of events list here -->
+                    <!--if there are any events-->
+                    <% if (events.length > 0) { %>
+                        <% events.forEach(eachEvent => {
+                            let eventTitle = eachEvent['seTitle'];
+                            let eventStartDate = eachEvent['seStartDate'];
+                            let eventDescription = eachEvent['seDescription']; %>
+                            <!-- add on click to call the modal form -->
+                            <td><button type="submit" class="btn" class = "events"value="<%= eventTitle %>">
+                                <%= eventTitle %></button></td>
+                                <td><%= eventStartDate %></td>
+                            <td><%= eventDescription %></td>
+                        </tr>
+                        <% }) %>
+                    <% }
+                    else
+                    { %>
+                        <td colspan="3">There are no events to display...</td>
+                    <%} %>
+
+                <% } %>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>
